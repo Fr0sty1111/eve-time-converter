@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#101827">
+<meta name="description" content="EVE Online UTC to Hobart time converter with automatic daylight saving.">
+<title>EVE Time — Hobart</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<style>
+:root{color-scheme:dark;--bg:#0b1220;--panel:#121e30;--panel2:#18263b;--line:#293a53;--text:#eef4ff;--muted:#a8b8ce;--accent:#66c7ff;--accent2:#17496a;--good:#8ce0b0}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#172b45 0,#0b1220 58%);color:var(--text);font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;min-height:100vh}
+main{width:min(100%,680px);margin:auto;padding:env(safe-area-inset-top) 16px calc(24px + env(safe-area-inset-bottom))}
+header{padding:24px 4px 18px;display:flex;align-items:center;gap:12px}header img{width:48px;height:48px}h1{font-size:1.35rem;margin:0}header p{margin:2px 0 0;color:var(--muted);font-size:.85rem}
+.card{background:linear-gradient(160deg,#16243a,#101b2c);border:1px solid var(--line);border-radius:20px;padding:18px;margin:12px 0;box-shadow:0 10px 30px #0003}
+.card h2{font-size:.9rem;letter-spacing:.07em;margin:0 0 12px;color:#c8d8ed}
+.clockgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.clock{background:#0b1525;border:1px solid var(--line);border-radius:14px;padding:14px 12px}.clock .name{font-size:.76rem;color:var(--muted)}.clock .time{font-size:clamp(1.65rem,7vw,2.2rem);font-weight:750;letter-spacing:-.04em;font-variant-numeric:tabular-nums;margin:4px 0}.clock .date{font-size:.78rem;color:var(--muted)}.pill{display:inline-block;font-size:.7rem;border-radius:99px;padding:3px 8px;background:var(--accent2);color:#d8f2ff;margin-top:7px}
+label{display:block;color:var(--muted);font-size:.83rem;margin:12px 0 6px}input,button{font:inherit}input{width:100%;padding:13px;border:1px solid var(--line);border-radius:12px;background:#0a1525;color:var(--text);font-size:1rem;min-height:48px}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:10px}.primary{width:100%;border:0;border-radius:12px;padding:14px;margin-top:14px;background:var(--accent);color:#071523;font-weight:750;min-height:50px}
+.result{margin-top:14px;padding:15px;border-radius:14px;background:#0a1525;border:1px solid var(--line)}.result strong{display:block;font-size:1.9rem;font-variant-numeric:tabular-nums}.result small{color:var(--muted)}
+.actions{display:flex;gap:8px;margin-top:10px}.secondary{flex:1;border:1px solid var(--line);border-radius:11px;padding:10px;background:var(--panel2);color:var(--text);min-height:44px}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}th,td{text-align:left;padding:9px 7px;border-bottom:1px solid var(--line);font-size:.87rem}th{color:var(--muted);font-size:.74rem;text-transform:uppercase;letter-spacing:.04em}td:last-child{text-align:right;font-weight:650}.nowrow{background:#15354a}.note{font-size:.78rem;color:var(--muted);margin:10px 2px}.status{font-size:.8rem;color:var(--good);min-height:1.2em}.footer{text-align:center;color:var(--muted);font-size:.75rem;padding:12px}
+@media(max-width:360px){main{padding-left:11px;padding-right:11px}.card{padding:14px}.clockgrid{gap:7px}.clock{padding:10px 8px}}
+</style>
+</head>
+<body>
+<main>
+<header><img src="icon.svg" alt=""><div><h1>EVE Time Converter</h1><p>New Eden UTC ↔ Hobart, Tasmania</p></div></header>
+
+<section class="card">
+<h2>LIVE CLOCKS</h2>
+<div class="clockgrid">
+ <div class="clock"><div class="name">EVE SERVER</div><div class="time" id="utcTime">--:--:--</div><div class="date" id="utcDate">Loading…</div><span class="pill">UTC</span></div>
+ <div class="clock"><div class="name">HOBART LOCAL</div><div class="time" id="localTime">--:--:--</div><div class="date" id="localDate">Loading…</div><span class="pill" id="localZone">AEST / AEDT</span></div>
+</div>
+</section>
+
+<section class="card">
+<h2>CONVERT EVE TIME TO HOBART</h2>
+<div class="fields">
+ <div><label for="eveDate">EVE date (UTC)</label><input id="eveDate" type="date"></div>
+ <div><label for="eveTime">EVE time (UTC)</label><input id="eveTime" type="time" value="12:00"></div>
+</div>
+<button class="primary" id="convert">Convert time</button>
+<div class="result" aria-live="polite"><small>HOBART LOCAL TIME</small><strong id="convertedTime">—</strong><div id="convertedDate" class="date">Choose an EVE date and time</div><small id="offset"></small></div>
+<div class="actions"><button class="secondary" id="copy">Copy result</button><button class="secondary" id="setToday">Today (UTC)</button></div>
+<div class="status" id="message" role="status"></div>
+</section>
+
+<section class="card">
+<h2>HOURLY CONVERSION TABLE</h2>
+<p class="note" id="tableDate">Hobart equivalent for each EVE server hour on the selected UTC date.</p>
+<div style="overflow-x:auto"><table><thead><tr><th>EVE (UTC)</th><th>Hobart</th><th>Date change</th></tr></thead><tbody id="hourRows"></tbody></table></div>
+</section>
+<p class="note">Daylight saving is handled automatically using the Australia/Hobart time zone. Hobart is UTC+10 in AEST and UTC+11 in AEDT.</p>
+<div class="actions"><button class="secondary" id="install" hidden>Install app</button><button class="secondary" id="refresh">Refresh clocks</button></div>
+<div class="footer">EVE Time Converter · Unofficial fan-made utility</div>
+</main>
+<script>
+const TZ='Australia/Hobart';
+const $=id=>document.getElementById(id);
+const fmt=(d,opts,tz)=>new Intl.DateTimeFormat('en-AU',{timeZone:tz,...opts}).format(d);
+function dateInZone(d,tz){return new Intl.DateTimeFormat('en-CA',{timeZone:tz,year:'numeric',month:'2-digit',day:'2-digit'}).format(d)}
+function offsetInZone(d){
+ const p=new Intl.DateTimeFormat('en-AU',{timeZone:TZ,timeZoneName:'longOffset'}).formatToParts(d);
+ return p.find(x=>x.type==='timeZoneName')?.value?.replace('GMT','UTC')||'';
+}
+function zoneShort(d){return fmt(d,{timeZoneName:'short'},TZ)}
+function tick(){
+ const now=new Date();
+ $('utcTime').textContent=fmt(now,{hour:'2-digit',minute:'2-digit',second:'2-digit',hourCycle:'h23'},'UTC');
+ $('utcDate').textContent=fmt(now,{weekday:'short',day:'numeric',month:'short',year:'numeric'},'UTC');
+ $('localTime').textContent=fmt(now,{hour:'2-digit',minute:'2-digit',second:'2-digit',hourCycle:'h23'},TZ);
+ $('localDate').textContent=fmt(now,{weekday:'short',day:'numeric',month:'short',year:'numeric'},TZ);
+ $('localZone').textContent=zoneShort(now)+' · '+offsetInZone(now);
+}
+function convert(){
+ const date=$('eveDate').value,time=$('eveTime').value;
+ if(!date||!time){$('message').textContent='Please enter both a date and a time.';return null}
+ // EVE timestamps are UTC. ISO with Z gives an unambiguous instant.
+ const d=new Date(date+'T'+time+':00Z');
+ if(Number.isNaN(d.getTime())){$('message').textContent='Please enter a valid date and time.';return null}
+ const t=fmt(d,{hour:'2-digit',minute:'2-digit',hourCycle:'h23'},TZ);
+ const day=fmt(d,{weekday:'long',day:'numeric',month:'long',year:'numeric'},TZ);
+ const result={date:d,time:t,day,zone:zoneShort(d),offset:offsetInZone(d)};
+ $('convertedTime').textContent=t;
+ $('convertedDate').textContent=day+' · '+result.zone;
+ $('offset').textContent=result.offset+' relative to UTC';
+ $('message').textContent='';
+ buildTable(date);
+ return result;
+}
+function buildTable(date){
+ const [y,m,day]=date.split('-').map(Number);
+ const start=Date.UTC(y,m-1,day);
+ $('tableDate').textContent='Hobart equivalent for each EVE server hour on '+fmt(new Date(start),{weekday:'long',day:'numeric',month:'long',year:'numeric'},'UTC')+'.';
+ const selected=$('eveTime').value.slice(0,2);
+ let html='';
+ for(let h=0;h<24;h++){
+  const d=new Date(start+h*3600000);
+  const hobartDate=dateInZone(d,TZ);
+  const eveDate=date;
+  const time=fmt(d,{hour:'2-digit',minute:'2-digit',hourCycle:'h23'},TZ);
+  const dayLabel=hobartDate===eveDate?'Same day':hobartDate>eveDate?'Next day':'Previous day';
+  html+=`<tr class="${String(h).padStart(2,'0')===selected?'nowrow':''}"><td>${String(h).padStart(2,'0')}:00</td><td>${time}</td><td>${dayLabel}</td></tr>`;
+ }
+ $('hourRows').innerHTML=html;
+}
+function setToday(){
+ const now=new Date();
+ $('eveDate').value=dateInZone(now,'UTC');
+ $('eveTime').value=fmt(now,{hour:'2-digit',minute:'2-digit',hourCycle:'h23'},'UTC');
+ convert();
+}
+$('convert').addEventListener('click',convert);
+$('eveDate').addEventListener('change',convert);
+$('eveTime').addEventListener('change',convert);
+$('setToday').addEventListener('click',setToday);
+$('refresh').addEventListener('click',tick);
+$('copy').addEventListener('click',async()=>{
+ const r=convert();if(!r)return;
+ const text=`EVE: ${$('eveDate').value} ${$('eveTime').value} UTC\nHobart: ${r.day} ${r.time} ${r.zone} (${r.offset})`;
+ try{await navigator.clipboard.writeText(text);$('message').textContent='Converted time copied.'}
+ catch(e){$('message').textContent=text}
+});
+let installPrompt;
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();installPrompt=e;$('install').hidden=false});
+$('install').addEventListener('click',async()=>{if(!installPrompt)return;installPrompt.prompt();await installPrompt.userChoice;installPrompt=null;$('install').hidden=true});
+if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('./sw.js').catch(()=>{});
+tick();setInterval(tick,1000);setToday();
+</script>
+</body></html>
