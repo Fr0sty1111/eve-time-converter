@@ -1,7 +1,7 @@
 {
-  "name": "EVE Time Converter \u2014 Hobart",
+  "name": "EVE Time Converter — Local Time",
   "short_name": "EVE Time",
-  "description": "EVE Online UTC to Hobart time converter with live clocks and daylight saving.",
+  "description": "EVE Online UTC to your current local time with GPS place identification.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
@@ -9,17 +9,7 @@
   "background_color": "#0b1220",
   "theme_color": "#101827",
   "icons": [
-    {
-      "src": "icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    }
+    {"src":"icon-192.png","sizes":"192x192","type":"image/png","purpose":"any"},
+    {"src":"icon-512.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}
   ]
 }

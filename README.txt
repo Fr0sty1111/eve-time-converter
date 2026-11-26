@@ -1,27 +1,19 @@
-# EVE Time Converter — Hobart
+EVE Time Converter — Location Update
 
-A small installable Progressive Web App for Google Pixel / Android.
+Replace the existing files in your GitHub repository with these updated files.
 
-## Features
-- Live EVE server clock (UTC) and Hobart clock
-- EVE UTC date/time to Hobart conversion
-- Automatic AEST/AEDT daylight-saving handling via `Australia/Hobart`
-- 24-hour conversion table with previous/next-day labels
-- Copy converted result
-- Offline app shell after first successful load
+Changes:
+- Replaces fixed Hobart time with the Pixel's current system timezone.
+- Adds a Find my location button using browser GPS permission.
+- Looks up a nearby town/city using OpenStreetMap Nominatim reverse geocoding.
+- Remembers the last identified place name on this device.
+- Keeps live clocks, UTC conversion and hourly table working offline.
+- Bumps service worker cache to v2 so the new app shell is fetched.
 
-## Install on your Pixel
-A PWA must be served from HTTPS (or localhost) to be installable. It cannot be installed as a normal app by opening `index.html` from Downloads.
-
-1. Put all four files (`index.html`, `manifest.webmanifest`, `sw.js`, `icon.svg`) in the same folder on an HTTPS static host.
-2. Open that HTTPS address in Chrome on your Pixel.
-3. Open Chrome's ⋮ menu and choose **Install app** or **Add to Home screen**.
-4. Confirm. The EVE Time icon will appear on your home screen.
-
-You can host the folder on GitHub Pages, Netlify, or another HTTPS static host. No account or server-side database is needed for the app itself.
-
-## Notes
-- EVE server time is UTC.
-- The app uses the device's built-in IANA time-zone database for `Australia/Hobart`; daylight saving changes are automatic.
-- Live clocks use the phone's current system clock. Ensure Android date/time is set automatically for best results.
-- This is an unofficial fan-made utility and is not affiliated with CCP Games.
+Important:
+- Enable Android automatic time zone so the phone's timezone follows travel.
+- GPS permission is requested only when the user taps Find my location.
+- A place-name lookup requires internet and sends coordinates to OpenStreetMap Nominatim.
+- If offline or lookup fails, it shows coordinates and continues using the phone's timezone.
+- Timezone comes from the Pixel's system timezone. Browser GPS does not itself provide a timezone.
+- OpenStreetMap attribution is included in the app footer.
