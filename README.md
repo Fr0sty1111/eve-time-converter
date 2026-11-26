@@ -1,2 +1,2 @@
 # eve-time-converter
-Converts UTC to Hobart local time
+Converts UTC to Local time
